@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/templates/crud-tradicional/plantilla.html::head">
+    <title th:text="${titulo}">Listar Usuarios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .card {
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+        .card-body {
+            padding: 1rem;
+        }
+        .card-title {
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .card-text {
+            margin-bottom: 0.25rem;
+        }
+        .btn-group {
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="jumbotron">
+        <h1 class="display-4" th:text="${titulo}">Listado de Usuarios</h1>
+        <p class="lead">Listado de los usuarios registrados</p>
+        <a href="/crud-Articulo/" class="btn btn-success">Lista de Artículos</a>
+    </div>
+
+    <a href="/crud-Usuario/crear" class="btn btn-primary mb-3">Nuevo Usuario</a>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Iterar sobre cada usuario y mostrar como una tarjeta -->
+            <div th:each="usuario : ${lista}" class="card">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${usuario.nombre}">Nombre del Usuario</h5>
+                    <p class="card-text" th:text="'Username: ' + ${usuario.username}">Username: [Username]</p>
+                    <p class="card-text" th:text="'Rol: ' + ${usuario.rol}">Rol: [Rol]</p>
+                    <div class="btn-group">
+                        <a th:href="'editar/' + ${usuario.username}" class="btn btn-secondary btn-sm">Editar</a>
+                        <a th:href="'eliminar/' + ${usuario.username}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluyendo la parte de javascript del template -->
+<div th:replace="/templates/crud-tradicional/plantilla.html::javascript"></div>
+
+</body>
+</html>

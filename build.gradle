@@ -1,0 +1,82 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'org.Main'
+version = '1.0-SNAPSHOT'
+
+mainClassName = 'org.Main'
+
+repositories {
+    mavenCentral()
+}
+
+ext{
+    openapi = "6.1.3"
+}
+
+dependencies {
+    //Libreria test
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    //dependencia de Javalin
+    implementation 'io.javalin:javalin:6.1.3'
+
+    //manejo de log.
+    implementation("org.slf4j:slf4j-simple:2.0.10")
+
+    //libreria jsoup.
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
+
+    //Procesamiento JSON.
+    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.15.2')
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+
+    // En la versión 5.3.X separaron las clases del renderizado en otro proyecto
+    implementation "io.javalin:javalin-rendering:6.1.3"
+
+    //sistemas de plantilla:
+    implementation 'org.freemarker:freemarker:2.3.32'
+    implementation 'org.thymeleaf:thymeleaf:3.1.1.RELEASE'
+    implementation 'org.apache.velocity:velocity-engine-core:2.3'
+
+    // H2 Database
+    implementation 'com.h2database:h2:2.1.214'
+
+    // JPA con Hibernate
+    implementation 'org.hibernate:hibernate-core:6.4.1.Final'
+    implementation 'com.h2database:h2:2.2.224'
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+    // Java EE API para JPA
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+
+    // Encriptación
+    implementation 'org.jasypt:jasypt:1.9.3'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    annotationProcessor("io.javalin.community.openapi:openapi-annotation-processor:$openapi")
+    implementation("io.javalin.community.openapi:javalin-openapi-plugin:$openapi") // for /openapi route with JSON scheme
+    implementation("io.javalin.community.openapi:javalin-swagger-plugin:$openapi") // for Swagger UI
+    implementation("io.javalin.community.openapi:javalin-redoc-plugin:$openapi") // for ReDoc UI
+
+    implementation 'org.postgresql:postgresql:42.6.0' // Usa la versión más reciente
+
+    implementation 'io.netty:netty-all:4.1.109.Final'
+
+}
+
+application{
+    mainClass = 'main.Main'
+}
+
+test {
+    useJUnitPlatform()
+}
+run{
+    standardInput = System.in
+}

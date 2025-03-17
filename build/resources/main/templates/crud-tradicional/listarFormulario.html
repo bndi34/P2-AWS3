@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="/templates/crud-tradicional/plantilla.html::head">
+    <title th:text="${titulo}">Listar Formularios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Incluir OpenLayers CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css" />
+    <!-- Incluir Offline.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/offline-js/0.7.19/offline.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/offline-js/0.7.19/themes/offline-theme-slide.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/offline-js/0.7.19/themes/offline-language-spanish.css">
+    <style>
+        /* Tus estilos actuales */
+        .card {
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+
+        .card-body:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .card-text {
+            margin-bottom: 0.25rem;
+            color: #6c757d;
+        }
+
+        .btn-group {
+            margin-top: 0.5rem;
+        }
+
+        #map {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+        }
+
+        .btn {
+            margin-right: 0.5rem;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .buttonContainer {
+            margin-top: ;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4" th:text="${titulo}">Listado de Formularios</h1>
+            <p class="lead">Listado de los formularios registrados</p>
+            <a href="/login" class="btn btn-success" th:text="${logState}"></a>
+            <a href="/crud-Formulario/crear" class="btn btn-success">Nuevo Formulario</a>
+            <!-- Botón de sincronización masiva -->
+            <a href="/crud-Formulario/sincronizar" class="btn btn-warning" th:if="${sincronizar}">Sincronizar</a>
+
+            <!-- Estado de sincronización -->
+            <div id="sync-status" class="badge bg-secondary">Sincronizado</div>
+
+            <div id="buttonContainer"></div>
+            <!-- Script para botón de listar usuario -->
+            <script th:inline="javascript">
+                document.addEventListener("DOMContentLoaded", function () {
+                    let mostrarBoton = [[${ mostrarBoton } ?: false]];
+                    const buttonContainer = document.getElementById('buttonContainer');
+
+                    if (mostrarBoton) {
+                        buttonContainer.innerHTML =
+                            '<a href="/crud-Usuario/" class="btn btn-success">Administrar Usuarios</a> ';
+                    }
+                });
+            </script>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <!-- Iterar sobre cada formulario y mostrar como una tarjeta -->
+                <div th:each="formulario : ${lista}" class="card">
+                    <div class="card-body">
+                        <a class="card-title" th:text="${formulario.nombre}" th:href="'visualizar/'+${formulario.Id}" />
+                        <p class="card-text" th:text="'Sector: ' + ${formulario.sector}">Sector: [Sector]</p>
+                        <p class="card-text" th:text="'Nivel Escolar: ' + ${formulario.nivelEscolar}">Nivel Escolar:
+                            [Nivel Escolar]</p>
+                        <p class="card-text" th:text="'Usuario: ' + ${formulario.usuario.username}">Usuario: [Usuario]
+                        </p>
+                        <p class="card-text" th:text="'Fecha de Registro: ' + ${formulario.fechaRegistro}">Fecha de
+                            Registro: [Fecha]</p>
+                        <p class="card-text"
+                            th:text="'Coordenadas: ' + ${formulario.Longitud} + ' ' + ${formulario.Latitud}">
+                            Coordenadas: [Longitud] [Latitud]</p>
+
+                        <div class="btn-group">
+                            <!-- Botón Editar -->
+                            <a th:href="'editar/' + ${formulario.id}" class="btn btn-secondary btn-sm"
+                                th:if="${not formulario.sincronizado}">Editar</a>
+
+                            <!-- Botón Eliminar -->
+                            <a th:href="'eliminar/' + ${formulario.id}" class="btn btn-danger btn-sm"
+                                th:if="${not formulario.sincronizado}">Eliminar</a>
+
+                            <div th:if="${formulario.sincronizado}">
+                                <span class="badge bg-success">Sincronizado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/offline-js@0.7.19/offline.min.js"></script>
+
+    <!-- a alguien no le gusta que Web Socket esté en el programa -.- -->
+    <script>
+        const socket = new WebSocket('ws://localhost:7086/ws/formularios');
+
+        // Escuchar mensajes del servidor
+        socket.onmessage = function (event) {
+            const mensaje = event.data;
+            console.log("Mensaje recibido:", mensaje);
+
+            // Recargar la página si se recibe un mensaje de actualización
+            if (mensaje.startsWith("Formulario creado:") || mensaje.startsWith("Formulario eliminado:") || (mensaje.startsWith("Formulario Editado:"))) {
+                window.location.reload(); // Recargar la página
+            }
+        };
+
+        socket.onerror = function (error) {
+            console.error("Error WebSocket:", error);
+        };
+
+        // Manejar cierre de conexión
+        socket.onclose = function (event) {
+            console.log("Conexión WebSocket cerrada:", event);
+
+            setTimeout(connectWebSocket, 5000);
+        };
+    </script>
+
+    <!-- Script para manejar el modo offline -->
+
+    <script>
+        // Guardar operaciones offline
+        function saveOfflineOperation(operation) {
+            const pendingOperations = JSON.parse(localStorage.getItem('pendingOperations')) || [];
+            pendingOperations.push(operation);
+            localStorage.setItem('pendingOperations', JSON.stringify(pendingOperations));
+            updateSyncStatus();
+        }
+
+        // Sincronizar operaciones pendientes
+        function syncOfflineOperations() {
+            const pendingOperations = JSON.parse(localStorage.getItem('pendingOperations')) || [];
+            pendingOperations.forEach(op => {
+                let url, method;
+
+                if (op.type === 'crear') {
+                    url = '/crud-Formulario/crear';
+                    method = 'POST';
+                } else if (op.type === 'editar') {
+                    url = `/crud-Formulario/editar/${op.id}`;
+                    method = 'POST';
+                } else if (op.type === 'eliminar') {
+                    url = `/crud-Formulario/eliminar/${op.id}`;
+                    method = 'GET';
+                }
+
+                fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(op.data).toString()
+                }).then(response => {
+                    if (response.ok) {
+                        // Eliminar la operación sincronizada
+                        const updatedOperations = pendingOperations.filter(o => o !== op);
+                        localStorage.setItem('pendingOperations', JSON.stringify(updatedOperations));
+                        updateSyncStatus();
+                    }
+                });
+            });
+        }
+
+        // Actualizar estado de sincronización
+        function updateSyncStatus() {
+            const pendingOperations = JSON.parse(localStorage.getItem('pendingOperations')) || [];
+            const syncStatus = document.getElementById('sync-status');
+
+            if (pendingOperations.length > 0) {
+                syncStatus.textContent = `Pendientes: ${pendingOperations.length}`;
+                syncStatus.className = 'badge bg-warning';
+            } else {
+                syncStatus.textContent = 'Sincronizado';
+                syncStatus.className = 'badge bg-success';
+            }
+        }
+
+        // Escuchar eventos de conexión
+        Offline.on('confirmed-up', syncOfflineOperations);
+
+        // Actualizar estado al cargar la página
+        document.addEventListener('DOMContentLoaded', updateSyncStatus);
+    </script>
+
+    <!-- Incluyendo la parte de javascript del template -->
+    <div th:replace="/templates/crud-tradicional/plantilla.html::javascript"></div>
+</body>
+
+</html>

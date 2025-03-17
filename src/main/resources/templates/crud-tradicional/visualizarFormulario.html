@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Datos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        .data-container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .data-item {
+            flex: 2;
+            margin-bottom: 15px;
+        }
+
+        .data-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .data-item p {
+            margin: 0;
+        }
+
+        #map {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            /* Altura del mapa */
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1 class="display-4">Visualizar Datos</h1>
+        <br>
+        <!-- Contenedor de datos -->
+        <div class="data-container">
+
+
+
+
+            <!-- Nombre -->
+            <div class="data-item">
+                <label>Nombre:</label>
+                <p th:text="${formulario.nombre}"></p>
+
+                <label>Sector:</label>
+                <p th:text="${formulario.sector}"></p>
+
+                <label>Nivel Escolar:</label>
+                <p th:text="${formulario.nivelEscolar}"></p>
+
+                <label>Latitud:</label>
+                <p th:text="${formulario.latitud}"></p>
+
+                <label>Longitud:</label>
+                <p th:text="${formulario.longitud}"></p>
+
+                <label>Fecha de Registro:</label>
+                <p th:text="${#temporals.format(formulario.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></p>
+
+                <label>Sincronizado:</label>
+                <p th:text="${formulario.sincronizado} ? 'Sí' : 'No'"></p>
+            </div>
+
+            <div id="map" style="flex: 3;"></div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- Script para inicializar el mapa y agregar marcadores -->
+    <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
+
+    <script>
+
+        const formulario = {
+            latitud: [[${ formulario.latitud }]],
+            longitud: [[${ formulario.longitud }]]
+        };
+
+        const map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([formulario.longitud, formulario.latitud]),
+                zoom: 10,
+            }),
+            target: 'map',
+        });
+
+
+
+        const marker = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [
+
+                    new ol.Feature({
+                        geometry: new ol.geom.Point(
+                            ol.proj.fromLonLat([formulario.longitud, formulario.latitud])
+                        )
+                    })
+
+                ]
+            })
+        });
+        // Estilo del marcador
+        marker.setStyle(
+            new ol.style.Style({
+                image: new ol.style.Icon({
+                    src: 'https://openlayers.org/en/latest/examples/data/icon.png',
+                    scale: 0.5
+                })
+            })
+        );
+
+        map.addLayer(marker);
+
+
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

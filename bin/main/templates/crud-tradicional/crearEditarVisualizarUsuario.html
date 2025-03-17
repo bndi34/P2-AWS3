@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/templates/crud-tradicional/plantilla.html::head">
+  <title th:text="${titulo}">...</title>
+</head>
+<body>
+
+<div class="container">
+  <div class="jumbotron">
+    <h1 class="display-4" th:text="${titulo}">....</h1>
+  </div>
+
+  <!-- El endpoint que estará procesando el formulario será enviado por el controlador -->
+  <form enctype="multipart/form-data" method="post" th:attr="action=${accion}">
+    <div class="form-group">
+      <label for="idForm">ID de Usuario</label>
+      <input th:value="${usuario} ? ${usuario.id} : ''" type="text" name="id" class="form-control" id="idForm" readonly>
+    </div>
+
+    <!-- Campo para el nombre de usuario (username) -->
+    <div class="form-group">
+      <label for="usernameForm">Nombre de Usuario</label>
+      <input th:readonly="${visualizar}" th:value="${usuario} ? ${usuario.username} : ''" type="text" name="username" class="form-control" id="usernameForm" aria-describedby="usernameHelp">
+      <small id="usernameHelp" class="form-text text-muted">Indicar el nombre de usuario</small>
+    </div>
+
+    <!-- Campo para el nombre completo (nombre) -->
+    <div class="form-group">
+      <label for="nombreForm">Nombre Completo</label>
+      <input th:readonly="${visualizar}" th:value="${usuario} ? ${usuario.nombre} : ''" type="text" name="nombre" class="form-control" id="nombreForm">
+    </div>
+
+    <!-- Campo para la contraseña (password) -->
+    <div class="form-group">
+      <label for="passwordForm">Contraseña</label>
+      <input th:readonly="${visualizar}" th:value="${usuario} ? ${usuario.password} : ''" type="password" name="password" class="form-control" id="passwordForm">
+    </div>
+
+    <div class="form-group">
+      <label for="rolForm">Rol</label>
+      <input th:readonly="${visualizar}" th:value="${usuario} ? ${usuario.rol} : ''" type="text" name="rol" class="form-control" id="rolForm">
+    </div>
+
+    <!-- Botones para la creación o cancelación -->
+    <button th:if="${!visualizar}" type="submit" class="btn btn-primary">Crear</button>
+    <a href="/crud-Usuario/" class="btn btn-primary">Cancelar</a>
+  </form>
+</div>
+
+<!-- Incluyendo la parte de javascript del template -->
+<div th:replace="/templates/crud-tradicional/plantilla.html::javascript"></div>
+
+</body>
+</html>

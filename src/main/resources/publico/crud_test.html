@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD de Usuarios</title>
+</head>
+<body>
+<h1>CRUD de Usuarios</h1>
+<form id="userForm">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <label>
+        Admin: <input type="checkbox" id="admin">
+    </label>
+    <label>
+        Autor: <input type="checkbox" id="autor">
+    </label>
+    <button type="submit">Crear Usuario</button>
+</form>
+<h2>Lista de Usuarios</h2>
+<ul id="userList"></ul>
+
+<script>
+    const API_URL = 'http://localhost:7000/usuarios';
+
+    document.getElementById('userForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const usuario = {
+            username: document.getElementById('username').value,
+            nombre: document.getElementById('nombre').value,
+            password: document.getElementById('password').value,
+            admin: document.getElementById('admin').checked,
+            autor: document.getElementById('autor').checked
+        };
+
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(usuario)
+        });
+
+        loadUsers();
+    });
+
+    async function loadUsers() {
+        const response = await fetch(API_URL);
+        const users = await response.json();
+        const userList = document.getElementById('userList');
+        userList.innerHTML = '';
+        users.forEach(user => {
+            const li = document.createElement('li');
+            li.textContent = `${user.username} - ${user.nombre} - Admin: ${user.admin} - Autor: ${user.autor}`;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Eliminar';
+            deleteBtn.onclick = async () => {
+                await fetch(`${API_URL}/${user.username}`, { method: 'DELETE' });
+                loadUsers();
+            };
+
+            li.appendChild(deleteBtn);
+            userList.appendChild(li);
+        });
+    }
+
+    loadUsers();
+</script>
+</body>
+</html>

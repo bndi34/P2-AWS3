@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/templates/crud-tradicional/plantilla.html::head">
+  <title th:text="${titulo}">Formulario</title>
+  <!-- Incluir Offline.js -->
+  <script src="https://cdn.jsdelivr.net/npm/offline-js@0.7.19/offline.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/offline-js/0.7.19/themes/offline-theme-slide.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/offline-js/0.7.19/themes/offline-language-spanish.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="jumbotron">
+    <h1 class="display-4" th:text="${titulo}">Formulario</h1>
+  </div>
+
+  <form id="formulario" enctype="multipart/form-data" method="post" th:attr="action=${accion}">
+    <div class="form-group">
+      <label for="idForm">ID de Formulario</label>
+      <input th:value="${formulario} ? ${formulario.id} : ''" type="text" name="id" class="form-control" id="idForm" readonly>
+    </div>
+
+    <input type="hidden" name="UsuarioOriginal" th:value="${UsuarioOriginal}">
+
+    <div class="form-group">
+      <label for="nombreForm">Nombre</label>
+      <input th:readonly="${visualizar}" th:value="${formulario} ? ${formulario.nombre} : ''" type="text" name="nombre" class="form-control" id="nombreForm">
+    </div>
+
+    <div class="form-group">
+      <label for="sectorForm">Sector</label>
+      <input th:readonly="${visualizar}" th:value="${formulario} ? ${formulario.sector} : ''" type="text" name="sector" class="form-control" id="sectorForm">
+    </div>
+
+    <div class="form-group">
+      <label for="nivelEscolarForm">Nivel Escolar</label>
+      <select th:readonly="${visualizar}" name="nivelEscolar" class="form-control" id="nivelEscolarForm">
+        <option value="Basico" th:selected="${formulario} ? ${formulario.nivelEscolar == 'Basico'} : false">Básico</option>
+        <option value="Medio" th:selected="${formulario} ? ${formulario.nivelEscolar == 'Medio'} : false">Medio</option>
+        <option value="Grado Universitario" th:selected="${formulario} ? ${formulario.nivelEscolar == 'Grado Universitario'} : false">Grado Universitario</option>
+        <option value="Postgrado" th:selected="${formulario} ? ${formulario.nivelEscolar == 'Postgrado'} : false">Postgrado</option>
+        <option value="Doctorado" th:selected="${formulario} ? ${formulario.nivelEscolar == 'Doctorado'} : false">Doctorado</option>
+      </select>
+    </div>
+
+    <!-- Latitud y Longitud -->
+    <div class="form-group">
+      <label for="latitudForm">Latitud</label>
+      <input th:readonly="${visualizar}" type="text" name="latitud" class="form-control" id="latitudForm" readonly>
+    </div>
+    <div class="form-group">
+      <label for="longitudForm">Longitud</label>
+      <input th:readonly="${visualizar}" type="text" name="longitud" class="form-control" id="longitudForm" readonly>
+    </div>
+
+    <button th:if="${!visualizar}" type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/crud-Formulario/" class="btn btn-primary">Cancelar</a>
+  </form>
+</div>
+
+<div th:replace="/templates/crud-tradicional/plantilla.html::javascript"></div>
+<script src="https://cdn.jsdelivr.net/npm/offline-js@0.7.19/offline.min.js"></script>
+<!-- Incluir Offline.js -->
+<script>
+  Offline.options = {checks: {xhr: {url: '/'}}};
+  // Función para obtener la ubicación del usuario
+  function obtenerUbicacion() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          document.getElementById('latitudForm').value = position.coords.latitude;
+          document.getElementById('longitudForm').value = position.coords.longitude;
+        },
+        function(error) {
+          alert("No se pudo obtener la ubicación. Por favor, asegúrate de permitir el acceso a la ubicación.");
+        }
+      );
+    } else {
+      alert("Tu navegador no soporta la geolocalización.");
+    }
+  }
+
+  // Guardar operaciones offline
+  function saveOfflineOperation(operation) {
+    const pendingOperations = JSON.parse(localStorage.getItem('pendingOperations')) || [];
+    pendingOperations.push(operation);
+    localStorage.setItem('pendingOperations', JSON.stringify(pendingOperations));
+    alert('Estás offline. Los datos se guardarán localmente y se sincronizarán cuando vuelvas a estar online.');
+    window.location.href = '/crud-Formulario/';
+  }
+
+  // Manejar el envío del formulario
+  document.getElementById('formulario').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = {
+      id: document.getElementById('idForm').value,
+      nombre: document.getElementById('nombreForm').value,
+      sector: document.getElementById('sectorForm').value,
+      nivelEscolar: document.getElementById('nivelEscolarForm').value,
+      latitud: document.getElementById('latitudForm').value,
+      longitud: document.getElementById('longitudForm').value,
+      UsuarioOriginal: document.querySelector('input[name="UsuarioOriginal"]').value
+    };
+
+    const accion = document.getElementById('formulario').getAttribute('action');
+    const esEdicion = accion.includes('editar');
+    console.log(Offline.state)
+    alert(Offline.state)
+    if (Offline.state === 'up') {
+      // Enviar al servidor si hay conexión
+      
+      fetch(accion, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData).toString()
+                }).then(response => {
+        if (response.ok) {
+          window.location.href = '/crud-Formulario/';
+        }
+      });
+    } else {
+      // Guardar localmente si no hay conexión
+      const operation = {
+        type: esEdicion ? 'editar' : 'crear',
+        data: formData,
+        id: formData.id
+      };
+      saveOfflineOperation(operation);
+    }
+  });
+
+  // Obtener la ubicación al cargar la página
+  window.onload = obtenerUbicacion;
+</script>
+
+</body>
+</html>
