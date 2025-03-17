@@ -12,7 +12,7 @@ SWAP_SIZE="2048"  # Tamaño de la memoria swap en MiB
 EMAIL="yxgd0002@ce.pucmm.edu.do"  # Correo para Certbot
 DOMAIN="bandi-cachivaches.duckdns.org"  # Dominio para el certificado SSL
 REPO_DIR="~/I34nd1t"  # Directorio del repositorio clonado
-GITREPO= "https://github.com/I34nd1t/P2-AWS3" #Repositorio de Github del proyecto
+GITREPO= "https://github.com/I34nd1t/P2-AWS3.git" #Repositorio de Github del proyecto
 PROJECT_DIR="P2-AWS"  # Directorio del proyecto dentro del repositorio
 APACHE_CONF="seguro.conf"  # Nombre del archivo de configuración de Apache
 
