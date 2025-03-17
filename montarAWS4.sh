@@ -31,19 +31,19 @@ sudo cp ~/virtualhost-proxyreverso/configuraciones/seguro.conf /etc/apache2/site
 sudo cp ~/virtualhost-proxyreverso/configuraciones/proxyreverso.conf /etc/apache2/sites-available/
 
 # Creando las estructuras de los archivos.
-sudo mkdir -p /var/www/html/app1 /var/www/html/app2
+sudo mkdir -p /var/www/html/app1
 
 # Creando los archivos por defecto.
 printf "<h1>Sitio Aplicacion #1</h1>" | sudo tee /var/www/html/app1/index.html
-printf "<h1>Sitio Aplicacion #2</h1>" | sudo tee /var/www/html/app2/index.html
 
 # Clonando el proyecto ORM y moviendo a la carpeta descargada.
 cd ~/
-git clone https://github.com/vacax/orm-jpa
-cd orm-jpa
+git clone https://github.com/I34nd1t/P2-AWS3
+cd P2-AWS3
 
 # Ejecutando la creación de fatjar
+sudo chmod +x gradlew
 ./gradlew shadowjar
 
 # Subiendo la aplicación puerto por defecto.
-java -jar ~/orm-jpa/build/libs/app.jar > ~/orm-jpa/build/libs/salida.txt 2> ~/orm-jpa/build/libs/error.txt &
+java -jar ~/P2-AWS3/build/libs/app.jar > ~/P2-AWS3/build/libs/salida.txt 2> ~/P2-AWS3/build/libs/error.txt &
