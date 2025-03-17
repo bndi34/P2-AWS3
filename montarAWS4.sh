@@ -38,7 +38,7 @@ printf "<h1>Sitio Aplicacion #1</h1>" | sudo tee /var/www/html/app1/index.html
 
 # Clonando el proyecto ORM y moviendo a la carpeta descargada.
 cd ~/
-git clone https://github.com/I34nd1t/P2-AWS3
+git clone https://github.com/bndi34/P2-AWS3
 cd P2-AWS3
 
 # Ejecutando la creación de fatjar
